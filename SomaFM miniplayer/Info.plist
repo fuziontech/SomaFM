@@ -4,10 +4,12 @@
 <dict>
     <key>LSUIElement</key>
     <true/>
+    <key>CFBundleExecutable</key>
+    <string>SomaFM miniplayer</string>
     <key>CFBundleIdentifier</key>
-    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <string>com.droptables.somafm-miniplayer</string>
     <key>CFBundleName</key>
-    <string>$(PRODUCT_NAME)</string>
+    <string>SomaFM miniplayer</string>
     <key>CFBundleDisplayName</key>
     <string>SomaFM Player</string>
     <key>CFBundleShortVersionString</key>
