@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppKit
+import Combine
 
 @main
 struct SomaFM_miniplayerApp: App {
@@ -24,13 +25,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var audioPlayer: AudioPlayer!
     var menu: NSMenu!
     var menuManager: MenuManager!
+    private var cancellables = Set<AnyCancellable>()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create the status bar item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "play.circle", accessibilityDescription: "SomaFM Player")
+            button.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: "SomaFM Player")
             button.action = #selector(handleClick(_:))
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
@@ -38,6 +40,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Initialize managers
         audioPlayer = AudioPlayer.shared
         menuManager = MenuManager.shared
+        
+        // Observe playback state changes
+        audioPlayer.$isPlaying
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isPlaying in
+                self?.updateStatusIcon(isPlaying: isPlaying)
+            }
+            .store(in: &cancellables)
     }
     
     @objc func handleClick(_ sender: Any?) {
@@ -71,7 +81,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func updateStatusIcon(isPlaying: Bool) {
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: isPlaying ? "pause.circle" : "play.circle", 
+            button.image = NSImage(systemSymbolName: isPlaying ? "pause.fill" : "play.fill", 
                                  accessibilityDescription: isPlaying ? "Pause" : "Play")
         }
     }
