@@ -21,8 +21,9 @@ struct SomaFM_miniplayerApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
-    var popover: NSPopover!
     var audioPlayer: AudioPlayer!
+    var menu: NSMenu!
+    var menuManager: MenuManager!
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create the status bar item
@@ -30,26 +31,41 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "play.circle", accessibilityDescription: "SomaFM Player")
-            button.action = #selector(togglePopover(_:))
+            button.action = #selector(handleClick(_:))
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
         
-        // Create the popover
-        popover = NSPopover()
-        popover.contentSize = NSSize(width: 300, height: 400)
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: ChannelListView())
-        
-        // Initialize audio player
+        // Initialize managers
         audioPlayer = AudioPlayer.shared
+        menuManager = MenuManager.shared
     }
     
-    @objc func togglePopover(_ sender: Any?) {
-        if let button = statusItem.button {
-            if popover.isShown {
-                popover.performClose(sender)
-            } else {
-                popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+    @objc func handleClick(_ sender: Any?) {
+        guard let event = NSApp.currentEvent else { return }
+        
+        if event.type == .rightMouseUp {
+            // Right click - show channel menu
+            showChannelMenu()
+        } else if event.type == .leftMouseUp {
+            // Left click - play/pause only
+            if audioPlayer.isPlaying {
+                audioPlayer.pause()
+            } else if audioPlayer.currentChannel != nil {
+                audioPlayer.resume()
             }
+            // Do nothing if no channel has been selected yet
+        }
+    }
+    
+    func showChannelMenu() {
+        // Create and show menu
+        menu = menuManager.createMenu()
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        
+        // Clear menu after it's dismissed
+        DispatchQueue.main.async { [weak self] in
+            self?.statusItem.menu = nil
         }
     }
     

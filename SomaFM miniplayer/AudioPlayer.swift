@@ -15,6 +15,7 @@ class AudioPlayer: NSObject, ObservableObject {
     
     @Published var isPlaying = false
     @Published var currentChannel: Channel?
+    private var lastChannel: Channel?
     
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
@@ -42,6 +43,7 @@ class AudioPlayer: NSObject, ObservableObject {
                     self?.player?.play()
                     self?.isPlaying = true
                     self?.currentChannel = channel
+                    self?.lastChannel = channel
                     self?.updateAppDelegate()
                 } else if status == .failed {
                     print("Failed to load stream")
@@ -64,8 +66,20 @@ class AudioPlayer: NSObject, ObservableObject {
         player = nil
         playerItem = nil
         isPlaying = false
-        currentChannel = nil
+        // Don't clear currentChannel when stopping
         cancellables.removeAll()
+        updateAppDelegate()
+    }
+    
+    func pause() {
+        player?.pause()
+        isPlaying = false
+        updateAppDelegate()
+    }
+    
+    func resume() {
+        player?.play()
+        isPlaying = true
         updateAppDelegate()
     }
     
