@@ -42,6 +42,13 @@ class MenuManager: ObservableObject {
                 self?.updateMenu()
             }
             .store(in: &cancellables)
+        
+        audioPlayer.$currentSong
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateMenu()
+            }
+            .store(in: &cancellables)
     }
     
     func createMenu() -> NSMenu {
@@ -58,6 +65,27 @@ class MenuManager: ObservableObject {
                 channelManager.fetchChannels()
             }
         } else {
+            // Add current song info if playing
+            if let currentChannel = audioPlayer.currentChannel,
+               audioPlayer.isPlaying {
+                let nowPlayingItem = NSMenuItem(title: "Now Playing: \(currentChannel.title)", action: nil, keyEquivalent: "")
+                nowPlayingItem.isEnabled = false
+                menu.addItem(nowPlayingItem)
+                
+                if let song = audioPlayer.currentSong {
+                    let songItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+                    let attributedTitle = NSAttributedString(string: "  \(song)", attributes: [
+                        .font: NSFont.systemFont(ofSize: 11),
+                        .foregroundColor: NSColor.secondaryLabelColor
+                    ])
+                    songItem.attributedTitle = attributedTitle
+                    songItem.isEnabled = false
+                    menu.addItem(songItem)
+                }
+                
+                menu.addItem(NSMenuItem.separator())
+            }
+            
             // Add channels
             for channel in channelManager.channels {
                 let item = NSMenuItem(
