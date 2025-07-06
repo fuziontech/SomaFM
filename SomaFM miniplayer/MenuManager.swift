@@ -73,13 +73,15 @@ class MenuManager: ObservableObject {
                 menu.addItem(nowPlayingItem)
                 
                 if let song = audioPlayer.currentSong {
-                    let songItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-                    let attributedTitle = NSAttributedString(string: "  \(song)", attributes: [
+                    let songItem = NSMenuItem(title: "", action: #selector(searchForSong(_:)), keyEquivalent: "")
+                    let attributedTitle = NSAttributedString(string: "  🔍 \(song)", attributes: [
                         .font: NSFont.systemFont(ofSize: 11),
-                        .foregroundColor: NSColor.secondaryLabelColor
+                        .foregroundColor: NSColor.labelColor
                     ])
                     songItem.attributedTitle = attributedTitle
-                    songItem.isEnabled = false
+                    songItem.target = self
+                    songItem.representedObject = song
+                    songItem.toolTip = "Click to search in Apple Music"
                     menu.addItem(songItem)
                 }
                 
@@ -162,6 +164,51 @@ class MenuManager: ObservableObject {
     private func updateMenu() {
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
             appDelegate.menu = createMenu()
+        }
+    }
+    
+    @objc private func searchForSong(_ sender: NSMenuItem) {
+        guard let song = sender.representedObject as? String else { return }
+        
+        // Create submenu for search options
+        let submenu = NSMenu()
+        
+        let appleMusicItem = NSMenuItem(title: "Search in Apple Music", action: #selector(searchInAppleMusic(_:)), keyEquivalent: "")
+        appleMusicItem.target = self
+        appleMusicItem.representedObject = song
+        submenu.addItem(appleMusicItem)
+        
+        let youtubeItem = NSMenuItem(title: "Search in YouTube", action: #selector(searchInYouTube(_:)), keyEquivalent: "")
+        youtubeItem.target = self
+        youtubeItem.representedObject = song
+        submenu.addItem(youtubeItem)
+        
+        // Show submenu at cursor position
+        submenu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+    }
+    
+    @objc private func searchInAppleMusic(_ sender: NSMenuItem) {
+        guard let song = sender.representedObject as? String else { return }
+        
+        // URL encode the search query
+        let searchQuery = song.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        // Try Apple Music URL scheme first, fall back to web
+        if let url = URL(string: "music://music.apple.com/search?term=\(searchQuery)") {
+            NSWorkspace.shared.open(url)
+        } else if let url = URL(string: "https://music.apple.com/search?term=\(searchQuery)") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+    
+    @objc private func searchInYouTube(_ sender: NSMenuItem) {
+        guard let song = sender.representedObject as? String else { return }
+        
+        // URL encode the search query
+        let searchQuery = song.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        if let url = URL(string: "https://www.youtube.com/results?search_query=\(searchQuery)") {
+            NSWorkspace.shared.open(url)
         }
     }
 }

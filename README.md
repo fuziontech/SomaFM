@@ -7,6 +7,8 @@ A native macOS menu bar app for streaming SomaFM radio channels, built with Swif
 - 🎵 Stream all SomaFM channels directly from the menu bar
 - 🎮 Simple controls: left-click to play/pause, right-click for channel menu
 - 📊 Channels sorted by listener count (most popular first)
+- 🎶 Display currently playing song with real-time updates
+- 🔍 Search current song in Apple Music or YouTube with one click
 - 💾 Offline channel caching for reliability
 - 🎯 Native Apple Silicon (M1/M2/M3) support
 - 🔄 Automatic stream recovery on network interruptions
@@ -43,11 +45,24 @@ A native macOS menu bar app for streaming SomaFM radio channels, built with Swif
 ### Menu Options
 
 The right-click menu displays:
-- All available SomaFM channels (sorted by popularity)
-- Current listener count in tooltips
-- Currently playing channel marked with a checkmark
-- Play/Pause control for the current stream
-- Quit option
+- **Now Playing section** (when streaming):
+  - Current channel name
+  - Currently playing song with 🔍 icon (click to search)
+- **Channel list**:
+  - All available SomaFM channels (sorted by popularity)
+  - Current listener count in tooltips
+  - Currently playing channel marked with a checkmark
+- **Controls**:
+  - Play/Pause control for the current stream
+  - Quit option
+
+### Song Search
+
+When a song is playing:
+1. Click on the song title in the menu
+2. Choose to search in:
+   - **Apple Music**: Opens in the Music app (or web if not installed)
+   - **YouTube**: Opens search results in your default browser
 
 ## Architecture
 
