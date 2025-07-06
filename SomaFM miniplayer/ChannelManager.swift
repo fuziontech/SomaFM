@@ -32,7 +32,9 @@ class ChannelManager: ObservableObject {
             .map { response in
                 response.channels.map { channelData in
                     Channel(from: channelData)
-                }.filter { !$0.streamURL.isEmpty }
+                }
+                .filter { !$0.streamURL.isEmpty }
+                .sorted { ($0.listeners ?? 0) > ($1.listeners ?? 0) }
             }
             .receive(on: DispatchQueue.main)
             .sink(
