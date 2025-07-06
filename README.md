@@ -1,5 +1,7 @@
 # SomaFM Miniplayer
 
+[![Build and Test](https://github.com/yourusername/somafm-miniplayer/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/yourusername/somafm-miniplayer/actions/workflows/build-and-test.yml)
+
 A native macOS menu bar app for streaming SomaFM radio channels, built with Swift and SwiftUI. This app provides quick access to all SomaFM channels directly from your menu bar, with native Apple Silicon support.
 
 ## Features
@@ -79,3 +81,7 @@ This project is provided as-is for educational purposes. SomaFM is a registered 
 
 - [SomaFM](https://somafm.com) for providing excellent commercial-free radio
 - Inspired by the original SomaFM miniplayer
+
+## Developer
+
+Built by Drop Tables Software, LLC
